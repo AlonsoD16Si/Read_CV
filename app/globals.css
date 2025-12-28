@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   :root {
@@ -13,58 +11,113 @@
     --foreground: 0 0% 98%;
   }
 
-  * {
-    @apply border-border;
+  body {
+    background-color: white;
+    color: rgb(17 24 39);
   }
 
-  body {
-    @apply bg-white text-foreground dark:bg-black dark:text-gray-50;
+  .dark body {
+    background-color: black;
+    color: rgb(249 250 251);
   }
 }
 
-@layer utilities {
-  .prose-content {
-    @apply prose prose-lg dark:prose-invert max-w-none;
-  }
+/* Prose content styles */
+.prose-content {
+  max-width: none;
+}
 
-  .prose-content h1 {
-    @apply text-3xl font-bold mb-4 mt-8;
-  }
+.prose-content h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  margin-top: 2rem;
+}
 
-  .prose-content h2 {
-    @apply text-2xl font-semibold mb-3 mt-6;
-  }
+.prose-content h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  margin-top: 1.5rem;
+}
 
-  .prose-content h3 {
-    @apply text-xl font-semibold mb-2 mt-4;
-  }
+.prose-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  margin-top: 1rem;
+}
 
-  .prose-content p {
-    @apply mb-4 leading-relaxed;
-  }
+.prose-content p {
+  margin-bottom: 1rem;
+  line-height: 1.75;
+}
 
-  .prose-content ul,
-  .prose-content ol {
-    @apply mb-4 ml-6;
-  }
+.prose-content ul,
+.prose-content ol {
+  margin-bottom: 1rem;
+  margin-left: 1.5rem;
+}
 
-  .prose-content li {
-    @apply mb-2;
-  }
+.prose-content ul {
+  list-style-type: disc;
+}
 
-  .prose-content a {
-    @apply text-black underline hover:text-gray-600 dark:text-white dark:hover:text-gray-300;
-  }
+.prose-content ol {
+  list-style-type: decimal;
+}
 
-  .prose-content code {
-    @apply rounded bg-gray-100 px-1.5 py-0.5 text-sm font-mono dark:bg-gray-800;
-  }
+.prose-content li {
+  margin-bottom: 0.5rem;
+}
 
-  .prose-content pre {
-    @apply rounded-lg bg-gray-100 p-4 overflow-x-auto dark:bg-gray-800;
-  }
+.prose-content a {
+  color: black;
+  text-decoration: underline;
+}
 
-  .prose-content blockquote {
-    @apply border-l-4 border-gray-300 pl-4 italic dark:border-gray-700;
-  }
+.prose-content a:hover {
+  color: rgb(75 85 99);
+}
+
+.dark .prose-content a {
+  color: white;
+}
+
+.dark .prose-content a:hover {
+  color: rgb(209 213 219);
+}
+
+.prose-content code {
+  border-radius: 0.25rem;
+  background-color: rgb(243 244 246);
+  padding: 0.125rem 0.375rem;
+  font-size: 0.875rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.dark .prose-content code {
+  background-color: rgb(31 41 55);
+}
+
+.prose-content pre {
+  border-radius: 0.5rem;
+  background-color: rgb(243 244 246);
+  padding: 1rem;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.dark .prose-content pre {
+  background-color: rgb(31 41 55);
+}
+
+.prose-content blockquote {
+  border-left: 4px solid rgb(209 213 219);
+  padding-left: 1rem;
+  font-style: italic;
+}
+
+.dark .prose-content blockquote {
+  border-left-color: rgb(55 65 81);
 }

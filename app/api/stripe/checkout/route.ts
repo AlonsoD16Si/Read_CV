@@ -5,7 +5,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { createCheckoutSession } from "@/lib/stripe";
+import { createCheckoutSession, stripeInstance } from "@/lib/stripe";
 import { plans } from "@/config/plans";
 
 export async function POST(request: NextRequest) {
@@ -27,16 +27,12 @@ export async function POST(request: NextRequest) {
     }
 
     const plan = plans.pro;
-    if (!plan.stripePriceId) {
-      return NextResponse.json(
-        { error: "Stripe price ID not configured" },
-        { status: 500 }
-      );
-    }
+    // Use mock price ID if Stripe is not configured
+    const priceId = plan.stripePriceId || "price_mock_pro";
 
     const checkoutUrl = await createCheckoutSession(
       session.user.id,
-      plan.stripePriceId
+      priceId
     );
 
     return NextResponse.json({ url: checkoutUrl });

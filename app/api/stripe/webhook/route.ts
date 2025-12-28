@@ -3,8 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { stripe, handleStripeWebhook } from "@/lib/stripe";
-import Stripe from "stripe";
+import { stripeInstance, handleStripeWebhook } from "@/lib/stripe";
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -17,6 +16,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // In mock mode, skip signature verification
+  if (!process.env.STRIPE_SECRET_KEY || process.env.USE_MOCK_STRIPE === "true") {
+    const event = JSON.parse(body);
+    await handleStripeWebhook(event);
+    return NextResponse.json({ received: true, mock: true });
+  }
+
   if (!process.env.STRIPE_WEBHOOK_SECRET) {
     return NextResponse.json(
       { error: "Webhook secret not configured" },
@@ -24,10 +30,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let event: Stripe.Event;
+  let event: any;
 
   try {
-    event = stripe.webhooks.constructEvent(
+    event = stripeInstance.webhooks.constructEvent(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Navigation bar component
  */
 
@@ -7,6 +7,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { SignOutButton } from "@/components/layout/sign-out-button";
 import { siteConfig } from "@/config/site";
 
 export async function Navbar() {
@@ -28,11 +29,38 @@ export async function Navbar() {
                   Dashboard
                 </Button>
               </Link>
-              <Link href="/api/auth/signout">
-                <Button variant="outline" size="sm">
-                  Sign Out
-                </Button>
-              </Link>
+              {session.user.username ? (
+                <Link href={`/u/${session.user.username}`}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="hidden sm:inline-flex"
+                  >
+                    @{session.user.username}
+                  </Button>
+                </Link>
+              ) : (
+                <Link href="/dashboard/profile/create">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="hidden sm:inline-flex"
+                  >
+                    Set username
+                  </Button>
+                </Link>
+              )}
+              <div className="hidden flex-col items-end leading-tight md:flex">
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  {session.user.name || session.user.email}
+                </span>
+                {session.user.name && session.user.email && (
+                  <span className="text-xs text-gray-600 dark:text-gray-400">
+                    {session.user.email}
+                  </span>
+                )}
+              </div>
+              <SignOutButton />
             </>
           ) : (
             <>
@@ -51,4 +79,3 @@ export async function Navbar() {
     </nav>
   );
 }
-

@@ -73,18 +73,107 @@ model VerificationToken {
 }
 
 model Profile {
-    id        String   @id @default(cuid())
-    userId    String   @unique
-    username  String   @unique
-    content   String   @db.Text // MDX content
-    published Boolean  @default(false)
-    views     Int      @default(0)
+    id             String  @id @default(cuid())
+    userId         String  @unique
+    username       String  @unique
+    content        String? @db.Text // Legacy MDX content (optional, for backward compatibility)
+    published      Boolean @default(false)
+    views          Int?    @default(0) // Legacy view counter (optional)
+    theme          String? // Theme identifier (e.g., "minimal", "modern")
+    customDomain   String? // Custom domain for Pro users
+    seoTitle       String? // Custom SEO title
+    seoDescription String? @db.Text // Custom SEO description
+    seoKeywords    String? // Custom SEO keywords
+    removeBranding Boolean @default(false) // Pro feature
+
+    // Public Resume Fields - Professional Identity
+    displayName     String? // Display name (can differ from username)
+    headline        String? // Professional headline/tagline (e.g., "Senior Software Engineer")
+    location        String? // Geographic location (e.g., "San Francisco, CA")
+    profilePhotoUrl String? // URL to profile photo/avatar
+    accentColor     String? // Hex color for accent/branding (e.g., "#3b82f6")
+    layoutStyle     String? // Layout preference (e.g., "minimal", "modern", "compact")
+
+    // Social Links
+    githubUrl   String? // GitHub profile URL
+    linkedinUrl String? // LinkedIn profile URL
+    websiteUrl  String? // Personal website/portfolio URL
+    twitterUrl  String? // Twitter/X profile URL
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+    sections    ProfileSection[]
+    experiences ProfileExperience[] // Professional experiences (max 3)
+    analytics   Analytics[]
 
     @@index([username])
     @@index([userId])
     @@index([published])
+}
+
+model ProfileSection {
+    id        String   @id @default(cuid())
+    profileId String
+    // Section types: "hero", "about", "skills", "experience", "projects", "education", "links", "certifications", "mdx"
+    // Each type has a strict JSON schema defined in lib/profile-sections.ts
+    type      String
+    // JSON content structure varies by type:
+    // - hero: { fullName, title, tagline, location }
+    // - about: { summary }
+    // - skills: { categories: [{ name, items: [] }] }
+    // - experience: { items: [{ company, role, startDate, endDate, description, techStack }] }
+    // - projects: { items: [{ name, description, role, techStack, liveUrl, githubUrl }] }
+    // - education: { items: [{ degree, institution, startYear, endYear }] }
+    // - links: { items: [{ type, url }] } where type is "github" | "linkedin" | "portfolio" | "email" | "twitter"
+    // - certifications: { items: [{ name, issuer, date, url }] }
+    // - mdx: { mdx: string } (Pro feature)
+    content   Json
+    order     Int      @default(0) // Order of sections (lower = appears first)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+    @@index([profileId])
+    @@index([profileId, order])
+}
+
+model ProfileExperience {
+    id          String   @id @default(cuid())
+    profileId   String
+    company     String // Company name
+    role        String // Job title/role
+    startDate   String // Start date (ISO format or "YYYY-MM")
+    endDate     String? // End date (null for current position)
+    description String?  @db.Text // Job description/achievements (Markdown supported)
+    techStack   String[] // Technologies used
+    location    String? // Job location
+    order       Int      @default(0) // Order of experiences (0 = most recent)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+    // Enforce max 3 experiences per profile at application level
+
+    @@index([profileId])
+    @@index([profileId, order])
+}
+
+model Analytics {
+    id        String   @id @default(cuid())
+    profileId String
+    eventType String // "view", "click", "download", "contact"
+    referrer  String? // Where the traffic came from
+    userAgent String? // Browser/device info
+    ipAddress String? // IP address (hashed for privacy)
+    metadata  Json? // Additional event metadata
+    createdAt DateTime @default(now())
+
+    profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+    @@index([profileId])
+    @@index([profileId, eventType])
+    @@index([createdAt])
 }

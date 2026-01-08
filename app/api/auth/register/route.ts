@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       { message: "User created successfully", userId: user.id },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
@@ -55,9 +55,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Handle Prisma unique constraint errors
+    if (error?.code === "P2002") {
+      const field = error.meta?.target?.[0] || "field";
+      return NextResponse.json(
+        { error: `A user with this ${field} already exists` },
+        { status: 400 }
+      );
+    }
+
     console.error("Registration error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: error?.message || "Internal server error" },
       { status: 500 }
     );
   }

@@ -4,7 +4,6 @@
 
 import { ProfileFrontmatter } from "@/lib/mdx";
 import { siteConfig } from "@/config/site";
-import Link from "next/link";
 
 interface ProfileRendererProps {
   frontmatter: ProfileFrontmatter;
@@ -87,12 +86,14 @@ export function ProfileRenderer({
       <footer className="mt-16 border-t border-gray-200 pt-8 dark:border-gray-800">
         <p className="text-center text-sm text-gray-600 dark:text-gray-400">
           Powered by{" "}
-          <Link
-            href="/"
+          <a
+            href="https://nexary.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
             className="font-medium text-black hover:underline dark:text-white"
           >
             {siteConfig.name}
-          </Link>
+          </a>
         </p>
       </footer>
     </article>

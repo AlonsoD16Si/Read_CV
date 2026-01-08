@@ -7,25 +7,46 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { parseMDX, validateFrontmatter } from "@/lib/mdx";
+import { SectionBasedEditor } from "./section-based-editor";
 
 interface Profile {
   id: string;
   username: string;
-  content: string;
+  content?: string | null;
   published: boolean;
+  displayName?: string | null;
+  headline?: string | null;
+  location?: string | null;
+  profilePhotoUrl?: string | null;
+  accentColor?: string | null;
+  layoutStyle?: string | null;
+  sections?: Array<{
+    id: string;
+    type: string;
+    content: any;
+    order: number;
+  }>;
 }
 
 export function ProfileEditor({ profile }: { profile: Profile }) {
   const router = useRouter();
-  const [content, setContent] = useState(profile.content);
+  const hasMdx =
+    typeof profile.content === "string" && profile.content.length > 0;
+  const [content, setContent] = useState(profile.content || "");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [published, setPublished] = useState(profile.published);
 
   useEffect(() => {
-    setContent(profile.content);
+    setContent(profile.content || "");
     setPublished(profile.published);
   }, [profile]);
 
@@ -33,12 +54,14 @@ export function ProfileEditor({ profile }: { profile: Profile }) {
     setError("");
 
     try {
-      const parsed = parseMDX(content);
-      const validation = validateFrontmatter(parsed.frontmatter);
+      if (hasMdx) {
+        const parsed = parseMDX(content);
+        const validation = validateFrontmatter(parsed.frontmatter);
 
-      if (!validation.valid) {
-        setError(validation.errors.join(", "));
-        return;
+        if (!validation.valid) {
+          setError(validation.errors.join(", "));
+          return;
+        }
       }
 
       setLoading(true);
@@ -46,10 +69,7 @@ export function ProfileEditor({ profile }: { profile: Profile }) {
       const response = await fetch(`/api/profile/${profile.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          content,
-          published,
-        }),
+        body: JSON.stringify(hasMdx ? { content, published } : { published }),
       });
 
       const data = await response.json();
@@ -67,14 +87,18 @@ export function ProfileEditor({ profile }: { profile: Profile }) {
     }
   };
 
+  // If section-based profile, use the new editor
+  if (!hasMdx) {
+    return <SectionBasedEditor profile={profile} />;
+  }
+
+  // Legacy MDX editor
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Edit Profile</CardTitle>
-          <CardDescription>
-            Edit your MDX profile content. Changes are saved automatically.
-          </CardDescription>
+          <CardDescription>Edit your MDX profile content.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {error && (
@@ -109,11 +133,14 @@ export function ProfileEditor({ profile }: { profile: Profile }) {
             <Button onClick={handleSave} disabled={loading}>
               {loading ? "Saving..." : "Save Changes"}
             </Button>
-            {published && profile.username && (
+            {profile.username && (
               <Button
                 variant="outline"
                 onClick={() =>
-                  window.open(`/u/${profile.username}`, "_blank")
+                  window.open(
+                    `/u/${profile.username}${published ? "" : "?preview=1"}`,
+                    "_blank"
+                  )
                 }
               >
                 Preview
@@ -125,4 +152,3 @@ export function ProfileEditor({ profile }: { profile: Profile }) {
     </div>
   );
 }
-

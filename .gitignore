@@ -39,6 +39,9 @@ next-env.d.ts
 # prisma
 /prisma/migrations
 
+# uploaded files
+/public/uploads
+
 RULES.md
 SETUP.md
 README.md

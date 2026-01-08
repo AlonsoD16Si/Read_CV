@@ -1,12 +1,12 @@
 /**
- * Create profile page
+ * Create profile page - Onboarding flow
  */
 
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { ProfileCreator } from "@/components/profile/profile-creator";
+import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
 
 export default async function CreateProfilePage() {
   const session = await getServerSession(authOptions);
@@ -26,10 +26,13 @@ export default async function CreateProfilePage() {
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <div className="mx-auto max-w-4xl">
-        <h1 className="mb-8 text-3xl font-bold">Create Your Profile</h1>
-        <ProfileCreator userId={session.user.id} />
+      <div className="mb-8 text-center">
+        <h1 className="mb-2 text-3xl font-bold">Welcome to Nexary</h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          Let's create your professional identity in just a few steps
+        </p>
       </div>
+      <OnboardingWizard userId={session.user.id} />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 # Mensaje de Commit Sugerido
 
 ## Opción 1: Mensaje Corto y Directo
+
 ```
 feat: estructura inicial de Nexary CV Platform
 
@@ -19,6 +20,7 @@ feat: estructura inicial de Nexary CV Platform
 ```
 
 ## Opción 2: Mensaje Más Detallado
+
 ```
 feat: implementación inicial completa de Nexary CV Platform
 
@@ -46,6 +48,7 @@ Desarrollo:
 ```
 
 ## Opción 3: Mensaje Estilo Conventional Commits
+
 ```
 feat: setup inicial de Nexary CV Platform MVP
 
@@ -64,6 +67,7 @@ Closes #1
 ```
 
 ## Opción 4: Mensaje Simple (Recomendado para inicio)
+
 ```
 feat: estructura inicial completa del proyecto
 
@@ -86,4 +90,3 @@ feat: setup inicial de Nexary CV Platform
 - Sistema de temas y componentes UI
 - Usuario de prueba: test@example.com / password123
 ```
-

@@ -15,8 +15,8 @@ import {
 import { FaRocket } from "react-icons/fa";
 
 export const metadata: Metadata = generateSiteMetadata(
-  "Nexary - Your Professional Identity Platform",
-  "Nexary is your professional identity platform. Create a living, breathing representation of your career that's optimized to be found, understood, and hired."
+  "Nexary Identity - Your Professional Identity Platform",
+  "Nexary Identity is your professional identity platform. Create a living, breathing representation of your career that's optimized to be found, understood, and hired."
 );
 
 export default function HomePage() {

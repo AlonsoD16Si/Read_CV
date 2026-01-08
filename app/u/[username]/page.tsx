@@ -12,6 +12,7 @@ import { ProfessionalExperienceSection } from "@/components/profile/sections/pro
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import type { ProfileSection } from "@/lib/profile-sections";
 
 interface PageProps {
   params: Promise<{ username: string }>;
@@ -47,9 +48,11 @@ export async function generateMetadata({
 
   // Try to get description from hero section if available
   if (!seoDescription && profile.sections) {
-    const heroSection = profile.sections.find((s) => s.type === "hero");
+    const heroSection = profile.sections.find(
+      (s: ProfileSection) => s.type === "hero"
+    );
     if (heroSection && heroSection.content) {
-      const heroContent = heroSection.content as any;
+      const heroContent = heroSection.content as Record<string, unknown>;
       // Use new schema fields first, then legacy
       const heroTitle = heroContent.fullName || heroContent.name;
       const heroTagline = heroContent.tagline || heroContent.bio;
@@ -101,7 +104,7 @@ export default async function PublicProfilePage({
   }
 
   const resolvedSearchParams = searchParams
-    ? await Promise.resolve(searchParams as any)
+    ? await Promise.resolve(searchParams as { preview?: string })
     : undefined;
 
   // Find profile by username (don't filter by published yet)
@@ -181,33 +184,40 @@ export default async function PublicProfilePage({
           <article className="max-w-none">
             {!profile.published && (
               <div className="mb-8 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/40 dark:bg-amber-950/40 dark:text-amber-100">
-                You are viewing a draft preview of your profile. It won't be
-                visible publicly until you publish it.
+                You are viewing a draft preview of your profile. It won&apos;t
+                be visible publicly until you publish it.
               </div>
             )}
-            {profile.sections.map((section) => (
-              <SectionRenderer
-                key={section.id}
-                section={section as any}
-                profile={{
-                  displayName: profile.displayName,
-                  headline: profile.headline,
-                  location: profile.location,
-                  profilePhotoUrl: profile.profilePhotoUrl,
-                  accentColor: profile.accentColor,
-                  layoutStyle: profile.layoutStyle,
-                  githubUrl: profile.githubUrl,
-                  linkedinUrl: profile.linkedinUrl,
-                  websiteUrl: profile.websiteUrl,
-                  twitterUrl: profile.twitterUrl,
-                }}
-              />
-            ))}
+            {profile.sections.map(
+              (section: {
+                id: string;
+                type: string;
+                content: unknown;
+                order: number;
+              }) => (
+                <SectionRenderer
+                  key={section.id}
+                  section={section as ProfileSection}
+                  profile={{
+                    displayName: profile.displayName,
+                    headline: profile.headline,
+                    location: profile.location,
+                    profilePhotoUrl: profile.profilePhotoUrl,
+                    accentColor: profile.accentColor,
+                    layoutStyle: profile.layoutStyle,
+                    githubUrl: profile.githubUrl,
+                    linkedinUrl: profile.linkedinUrl,
+                    websiteUrl: profile.websiteUrl,
+                    twitterUrl: profile.twitterUrl,
+                  }}
+                />
+              )
+            )}
 
             {/* Professional Experiences from ProfileExperience table */}
             {profile.experiences && profile.experiences.length > 0 && (
               <ProfessionalExperienceSection
-                experiences={profile.experiences as any}
+                experiences={profile.experiences}
               />
             )}
 
@@ -244,8 +254,8 @@ export default async function PublicProfilePage({
       <div className="container mx-auto max-w-4xl px-4 py-16">
         {!profile.published && (
           <div className="mb-8 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/40 dark:bg-amber-950/40 dark:text-amber-100">
-            You are viewing a draft preview of your profile. It won't be visible
-            publicly until you publish it.
+            You are viewing a draft preview of your profile. It won&apos;t be
+            visible publicly until you publish it.
           </div>
         )}
         <ProfileRenderer frontmatter={parsed.frontmatter}>

@@ -42,7 +42,7 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button variant="ghost" size="icon" aria-label="Toggle theme">
+      <Button variant="ghost" size="sm" aria-label="Toggle theme">
         <FiMoon className="h-4 w-4" />
       </Button>
     );
@@ -51,7 +51,7 @@ export function ThemeToggle() {
   return (
     <Button
       variant="ghost"
-      size="icon"
+      size="sm"
       onClick={toggleTheme}
       aria-label="Toggle theme"
     >

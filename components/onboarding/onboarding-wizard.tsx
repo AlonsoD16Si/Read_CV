@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/card";
 import { validateUsername } from "@/lib/utils";
 import { getDefaultSections } from "@/lib/profile-sections";
-import { PhotoUpload } from "@/components/profile/photo-upload";
 
 type OnboardingStep = "username" | "hero" | "about" | "review" | "publish";
 
@@ -69,14 +68,14 @@ export function OnboardingWizard({ userId }: { userId: string }) {
   });
 
   const updateData = (
-    section: keyof OnboardingData,
+    section: "hero" | "about",
     field: string,
     value: string
   ) => {
     setData((prev) => ({
       ...prev,
       [section]: {
-        ...prev[section],
+        ...(prev[section] || {}),
         [field]: value,
       },
     }));
@@ -127,23 +126,23 @@ export function OnboardingWizard({ userId }: { userId: string }) {
       const defaultSections = getDefaultSections(userId);
 
       // Update hero section with new schema
-      defaultSections[0] = {
-        ...defaultSections[0],
-        content: {
+      const heroSection = defaultSections[0];
+      if (heroSection.type === "hero") {
+        heroSection.content = {
           fullName: data.hero.fullName,
           title: data.hero.title,
           tagline: data.hero.tagline,
           location: data.hero.location,
-        },
-      };
+        };
+      }
 
       // Update about section with new schema
-      defaultSections[1] = {
-        ...defaultSections[1],
-        content: {
+      const aboutSection = defaultSections[1];
+      if (aboutSection.type === "about") {
+        aboutSection.content = {
           summary: data.about.summary,
-        },
-      };
+        };
+      }
 
       const response = await fetch("/api/profile/create", {
         method: "POST",
@@ -171,7 +170,7 @@ export function OnboardingWizard({ userId }: { userId: string }) {
 
       router.push("/dashboard");
       router.refresh();
-    } catch (err) {
+    } catch {
       setError("An error occurred. Please try again.");
     } finally {
       setLoading(false);

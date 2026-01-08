@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { parseMDX, validateFrontmatter } from "@/lib/mdx";
 import { SectionBasedEditor } from "./section-based-editor";
+import type { ProfileSection } from "@/lib/profile-sections";
 
 interface Profile {
   id: string;
@@ -28,12 +29,7 @@ interface Profile {
   profilePhotoUrl?: string | null;
   accentColor?: string | null;
   layoutStyle?: string | null;
-  sections?: Array<{
-    id: string;
-    type: string;
-    content: any;
-    order: number;
-  }>;
+  sections?: ProfileSection[];
 }
 
 export function ProfileEditor({ profile }: { profile: Profile }) {
@@ -80,7 +76,7 @@ export function ProfileEditor({ profile }: { profile: Profile }) {
       }
 
       router.refresh();
-    } catch (err) {
+    } catch {
       setError("An error occurred. Please try again.");
     } finally {
       setLoading(false);
@@ -89,7 +85,14 @@ export function ProfileEditor({ profile }: { profile: Profile }) {
 
   // If section-based profile, use the new editor
   if (!hasMdx) {
-    return <SectionBasedEditor profile={profile} />;
+    return (
+      <SectionBasedEditor
+        profile={{
+          ...profile,
+          sections: profile.sections as ProfileSection[] | undefined,
+        }}
+      />
+    );
   }
 
   // Legacy MDX editor

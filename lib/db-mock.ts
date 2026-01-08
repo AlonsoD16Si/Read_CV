@@ -371,6 +371,27 @@ export const mockDb = {
       sectionsByProfileId.set(data.profileId, sections);
       return section;
     },
+    createMany: async (args: { data: any[] }) => {
+      const created: MockProfileSection[] = [];
+      for (const data of args.data) {
+        const section: MockProfileSection = {
+          id: `section_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          profileId: data.profileId,
+          type: data.type,
+          content: data.content,
+          order: data.order || 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        profileSections.set(section.id, section);
+        created.push(section);
+
+        const sections = sectionsByProfileId.get(data.profileId) || [];
+        sections.push(section);
+        sectionsByProfileId.set(data.profileId, sections);
+      }
+      return { count: created.length };
+    },
     update: async (args: { where: { id: string }; data: any }) => {
       const section = profileSections.get(args.where.id);
       if (!section) return null;
